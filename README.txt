@@ -12,13 +12,13 @@ Ruby 1.9.3 or later.
 Exapmple:
 
 # rakutenbank_account.yaml
-ID: "4009999999"
+ID: "hogehoge"
 PASS: "********"
 
-口座番号，パスワード，を情報を書いてください．
+アカウント名，パスワード，を入れてください．
 
-
-# rakutenbank_sample.rb
+↓こんな感じに預金残高と最新の履歴だけ取得出来ます．
+( rakutenbank_sample.rb )
 #!/usr/bin/ruby -Ku
 # -*- encoding: utf-8 -*-
 #
