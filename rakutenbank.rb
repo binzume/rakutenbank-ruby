@@ -55,21 +55,32 @@ class RakutenBank
     end
 
     if res.body =~ /INPUT_FORM:SECRET_WORD/
+
       q = ""
       if res.body.toutf8 =~ /質問<.*?>\s*([^\s<]+)\s*</m
         q = $1.strip
       end
 
-      raise "Aikotoba required! : " + q
-      # FIXME!!
+      ans = nil
+      if q != "" && account['QA']
+        dmy = {'a'=>nil}
+        ans = (account['QA'].find{|t|q.index(t['q'])} || dmy)['a']
+      end
+
+      raise "Aikotoba not found! for " + q unless ans
+      puts q + " => " + ans
+
       postdata = {
         'INPUT_FORM_SUBMIT'=>'1',
         'jsf_sequence'=>'2',
         'INPUT_FORM:_link_hidden_'=>'',
         'INPUT_FORM:_idJsp136' => 'INPUT_FORM:_idJsp136',
-        'INPUT_FORM:SECRET_WORD' => 'hoge'
+        'INPUT_FORM:TOKEN'=> get_match(res.body, /name="INPUT_FORM:TOKEN"\s+value="([^"]+)"/),
+        'INPUT_FORM:SECRET_WORD' => ans.tosjis
       }
-      res = @client.post(@url + '/MS/main/fcs/rb/fes/jsp/commonservice/Security/LoginAuthentication/SecretWordAuthentication/SecretWordAuthentication.jsp', postdata)
+      res = @client.post(@url + 'MS/main/fcs/rb/fes/jsp/commonservice/Security/LoginAuthentication/SecretWordAuthentication/SecretWordAuthentication.jsp', postdata)
+      raise "aikotoba rejected" if res.body =~ /INPUT_FORM:SECRET_WORD/
+
     end
 
     res = @client.get(@url + 'MS/main/gns?COMMAND=BALANCE_INQUIRY_START&&CurrentPageID=HEADER_FOOTER_LINK')
