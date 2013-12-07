@@ -19,7 +19,7 @@ class HTTPClient
   def pre_proc uri,headers = nil
     headers = headers || {}
     if @cookies[uri.host]
-      headers['Cookie'] = @cookies[uri.host].map{|k,v|k+'='+v}.join(';')
+      headers['Cookie'] = @cookies[uri.host].map{|k,v|k+'='+v.to_s}.join(';')
     end
     if @agent_name
       headers['User-Agent'] = @agent_name
