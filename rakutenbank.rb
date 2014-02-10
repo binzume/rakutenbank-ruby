@@ -38,7 +38,7 @@ class RakutenBank
       'LOGIN_SUBMIT'=>'1',
       'jsf_sequence'=>'1',
       'LOGIN:_link_hidden_'=>'',
-      'LOGIN:_idJsp79'=>'',
+      'LOGIN:_idJsp84'=>'',
       'LOGIN_SUBMIT'=>'1',
       'LOGIN:USER_ID'=>account['ID'],
       'LOGIN:LOGIN_PASSWORD'=>account['PASS']
@@ -91,7 +91,7 @@ class RakutenBank
       :branch => get_match(res.body, />\s+支店番号\s+([^<]+?)\s+</),
       :acc_num => get_match(res.body, />\s+口座番号\s+([^<]+?)\s+</),
       :last_login => get_match(res.body, />\s+前回ログイン日時\s+([^<]+?)\s+</),
-      :total => get_match(res.body.toutf8, /普通預金残高.*?>\s*([0-9,]+)\s*</m).gsub(/,/,'').to_i
+      :total => get_match(res.body.toutf8, /（支払可能残高）.*?>\s*([0-9,]+)\s*</m).gsub(/,/,'').to_i
     }
 
     @account_status = account_status
@@ -136,7 +136,7 @@ class RakutenBank
     }
 
     #p postdata
-    res = @client.post(@url + 'MS/main/fcs/rb/fes/jsp/mainservice/Inquiry/BalanceInquiry/BalanceInquiry/BalanceInquiry.jsp', postdata)
+    res = @client.get(@url + 'MS/main/gns?COMMAND=CREDIT_DEBIT_INQUIRY_START&&CurrentPageID=HEADER_FOOTER_LINK')
     #puts res.body
 
 
@@ -150,7 +150,7 @@ class RakutenBank
         amount = cells[2].gsub(/,/,'').to_i
         history << {
           :date => cells[0],
-          :description => cells[1].toutf8,
+          :description => cells[1].toutf8.gsub('&nbsp;',' '),
           :amount => amount,
           :in => amount>0 ? amount : nil,
           :out => amount<0 ? -amount : nil,
@@ -182,3 +182,4 @@ class RakutenBank
   end
 
 end
+
